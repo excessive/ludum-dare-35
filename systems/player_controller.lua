@@ -67,6 +67,7 @@ return tiny.processingSystem {
 		-- camera.position = entity.position + cpml.vec3(0, -3.75, 7)
 
 		--== Movement ==--
+		local snap_cancel = false
 
 		local move  = cpml.vec3(move_x, -move_y, 0)
 		local speed = 5
@@ -81,8 +82,61 @@ return tiny.processingSystem {
 			move = move / l
 		end
 
-		-- Move
+		--== Orientation ==--
 		local angle = cpml.vec2(move.x, move.y):angle_to() - math.pi / 2
+
+		-- Change direction player is facing, as long as they aren't mid-attack
+		if move.x ~= 0 or move.y ~= 0 and entity.anim_cooldown <= 0 then
+			local snap_to = camera.orientation:clone() * cpml.quat.rotate(angle, cpml.vec3(0, 0, 1))
+
+			if entity.snap_to then
+				-- Directions
+				local current = entity.snap_to * cpml.vec3.unit_y
+				local next    = snap_to * cpml.vec3.unit_y
+				local from    = current:dot(camera.direction)
+				local to      = next:dot(camera.direction)
+
+				-- If you move in the opposite direction, snap to end of slerp
+				if from ~= to and math.abs(from) - math.abs(to) == 0 then
+					entity.orientation = entity.snap_to:clone()
+				end
+			end
+
+			entity.snap_to = snap_to
+			entity.slerp   = 0
+		end
+
+		if entity.snap_to and entity.anim_cooldown <= 0 then
+			entity.orientation   = entity.orientation:slerp(entity.snap_to, 8*dt*2)
+			entity.orientation.x = 0
+			entity.orientation.y = 0
+			entity.orientation   = entity.orientation:normalize()
+			entity.slerp         = entity.slerp + dt
+
+			if entity.slerp > 1/2 then
+				entity.snap_to = nil
+				entity.slerp   = 0
+			end
+		end
+
+		if action or dodge then
+			snap_cancel = true
+		end
+
+		--- cancel the orientation transition if needed
+		if snap_cancel and entity.snap_to then
+			entity.orientation = entity.snap_to:clone()
+			entity.orientation.x = 0
+			entity.orientation.y = 0
+			entity.orientation   = entity.orientation:normalize()
+
+			entity.snap_to   = nil
+			entity.slerp     = 0
+		end
+
+		entity.direction = entity.orientation * -cpml.vec3.unit_y
+
+		-- Move
 		entity.move = entity.orientation * cpml.quat.rotate(-angle, cpml.vec3(0, 0, 1)) * move
 
 		if entity.anim_cooldown <= 0 then
@@ -134,44 +188,6 @@ return tiny.processingSystem {
 				self.sfx.step:play()
 			end
 		end
-
-		--== Orientation ==--
-
-		-- Change direction player is facing, as long as they aren't mid-attack
-		if move.x ~= 0 or move.y ~= 0 and entity.anim_cooldown <= 0 then
-			local snap_to = camera.orientation:clone() * cpml.quat.rotate(angle, cpml.vec3(0, 0, 1))
-
-			if entity.snap_to then
-				-- Directions
-				local current = entity.snap_to * cpml.vec3(0, 1, 0)
-				local next    = snap_to * cpml.vec3(0, 1, 0)
-				local from    = current:dot(camera.direction)
-				local to      = next:dot(camera.direction)
-
-				-- If you move in the opposite direction, snap to end of slerp
-				if from ~= to and math.abs(from) - math.abs(to) == 0 then
-					entity.orientation = entity.snap_to:clone()
-				end
-			end
-
-			entity.snap_to = snap_to
-			entity.slerp   = 0
-		end
-
-		if entity.snap_to and entity.anim_cooldown <= 0 then
-			entity.orientation   = entity.orientation:slerp(entity.snap_to, 8*dt*2)
-			entity.orientation.x = 0
-			entity.orientation.y = 0
-			entity.orientation   = entity.orientation:normalize()
-			entity.slerp         = entity.slerp + dt
-
-			if entity.slerp > 1/2 then
-				entity.snap_to = nil
-				entity.slerp   = 0
-			end
-		end
-
-		entity.direction = entity.orientation * -cpml.vec3.unit_y
 
 		--== Actions ==--
 		if entity.regen_cooldown and entity.hp < entity.max_hp then
