@@ -41,7 +41,7 @@ function menu:enter(from)
 	self.font = love.graphics.newFont("assets/fonts/NotoSans-Regular.ttf", 18)
 	self.indicator = love.graphics.newImage("assets/images/arrow.png")
 
-	-- self.logo = love.graphics.newImage("assets/images/logo.png")
+	self.logo = love.graphics.newImage("assets/images/logo.png")
 
 	self.state = { opacity = 1 }
 	self.locked = true
@@ -265,11 +265,12 @@ function menu:draw()
 	-- 	anchor:center_y() - self.logo:getHeight() / 1.5 + 9
 	-- )
 	-- love.graphics.setColor(225, 245, 255, 255)
-	-- love.graphics.draw(
-	-- 	self.logo,
-	-- 	anchor:right() - self.logo:getWidth() - 50,
-	-- 	anchor:center_y() - self.logo:getHeight() / 1.5 + 5
-	-- )
+	love.graphics.setColor(245, 255, 225, 255)
+	love.graphics.draw(
+		self.logo,
+		anchor:right() - self.logo:getWidth() - 50,
+		anchor:center_y() - self.logo:getHeight() / 2 + 5
+	)
 
 	for i, option in ipairs(self.options) do
 		local x, y = transform(spacing, i, self.options.current, #self.options)
