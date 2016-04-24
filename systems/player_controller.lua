@@ -144,7 +144,7 @@ return tiny.processingSystem {
 			entity.dodging  = false
 			entity.blocking = false
 		elseif entity.dodging then
-			entity.velocity = entity.dodging * (entity.speed * 1.5) * dt
+			entity.velocity = entity.dodging * (entity.speed) * dt
 			entity.position = entity.position + entity.velocity
 		elseif entity.blocking then
 			entity.velocity = cpml.vec3()

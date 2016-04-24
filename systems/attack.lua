@@ -62,7 +62,7 @@ return tiny.processingSystem {
 	filter = tiny.requireAll("attacking"),
 	process = function(self, entity, dt)
 		-- don't try to attack if we're stunned, dodging, etc.
-		if entity.stun or entity.dodging or entity.blocking then
+		if (entity.stun and entity.stun > 0) or entity.dodging or entity.blocking then
 			return
 		end
 		if entity.attacking then
