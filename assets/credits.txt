@@ -9,9 +9,15 @@ Colby Klein
 Colby Klein (SFX)
 Landon Manning (Vocal, SFX)
 Nadja (Vocal)
+EntranceJew (Vocal)
 
 ~ Music ~
 Anon - /jp/ Themesong 2 (Credits)
+
+~ i18n ~
+Landon Manning (English)
+Milène Gauthier (French)
+Nadja (German)
 
 ~ Contact ~
 Colby Klein (holo)
@@ -25,4 +31,5 @@ GitHub@Karai17
 GitHub@excessive
 http://excessive.moe
 
-THANKS BARTBES
+Special thanks to Bartbes for helping us fix our collisions,
+and josefnpat for pointing out the obvious at 6am.
