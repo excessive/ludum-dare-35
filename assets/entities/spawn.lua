@@ -1,10 +1,5 @@
-local cpml    = require "cpml"
-local iqm     = require "iqm"
-local memoize = require "memoize"
-
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
+local cpml = require "cpml"
+local load = require "load_files"
 
 return function(world, name, position, variant)
 	local entity = {
@@ -17,7 +12,7 @@ return function(world, name, position, variant)
 		orientation = cpml.quat(0, 0, 0, 1),
 		scale       = cpml.vec3(1, 1, 1),
 		color       = { 0.5, 0.5, 0.5 },
-		mesh        = load_model("assets/models/cube.iqm", false)
+		mesh        = load.model("assets/models/cube.iqm", false)
 	}
 
 	return entity

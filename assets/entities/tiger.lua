@@ -1,15 +1,5 @@
-local cpml    = require "cpml"
-local iqm     = require "iqm"
-local anim9   = require "anim9"
-local memoize = require "memoize"
-
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
-
-local load_anims = memoize(function(path)
-	return iqm.load_anims(path)
-end)
+local cpml = require "cpml"
+local load = require "load_files"
 
 return function(world, position, name, stat, stats, hp, scale, orientation, color, roughness)
 	local entity = {
@@ -19,11 +9,13 @@ return function(world, position, name, stat, stats, hp, scale, orientation, colo
 		enemy          = true,
 		aggro          = false,
 		aggro_position = false,
+		attacking      = false,
 		hp             = hp or 100,
 		max_hp         = hp or 100,
 		cooldown       = 0,
-		max_cooldown   = 1.75,
+		max_cooldown   = 2,
 		anim_cooldown  = 0,
+		stun           = 1.0, -- don't move for a bit after spawning
 		knockback      = 0,
 		orientation    = orientation or cpml.quat(0, 0, 0, 1),
 		scale          = cpml.vec3(scale or 1, scale or 1, scale or 1),
@@ -34,8 +26,8 @@ return function(world, position, name, stat, stats, hp, scale, orientation, colo
 		roughness      = roughness,
 		primary_stat   = stat or "atk",
 		stats          = stats or { atk=3, def=3, spd=3 },
-		mesh           = load_model("assets/models/tiger.iqm", false),
-		animation      = anim9(load_anims("assets/models/tiger.iqm")),
+		mesh           = load.model("assets/models/tiger.iqm", false),
+		animation      = load.anims("assets/models/tiger.iqm"),
 		textures       = {
 			body = "assets/textures/tiger_diffuse.png"
 		},

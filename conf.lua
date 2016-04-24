@@ -1,14 +1,14 @@
 -- Game flags (beyond love's own)
 -- TODO: Read a preferences file for conf stuff?
 FLAGS = {
-	game_version = "LD35",
-	debug_mode   = true,
+	game_version = "LD35 1.0.1",
+	debug_mode   = false,
 	show_perfhud = false
 }
 
 -- Specify window flags here because we use some of them for the error screen.
 local flags = {
-	title          = "👻 ~it is a mystery~ 👻",
+	title          = "Taiga Woods",
 	width          = 1280,
 	height         = 720,
 	fullscreen     = not FLAGS.debug_mode,

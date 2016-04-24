@@ -1,14 +1,12 @@
 local tiny       = require "tiny"
 local lume       = require "lume"
-local memoize    = require "memoize"
 local cpml       = require "cpml"
-local iqm        = require "iqm"
-local anim9      = require "anim9"
 local map_loader = require "map"
 local Grid       = require "jumper.grid"
 local anchor     = require "anchor"
 local timer      = require "timer"
 local convoke    = require "convoke"
+local load       = require "load_files"
 
 conversation = require("talkback").new()
 
@@ -51,28 +49,6 @@ local losing_matchup = {
 	atk = "spd"
 }
 
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
-
-local load_anims
-do
-	local _lanim = memoize(function(path)
-		return iqm.load_anims(path)
-	end)
-	load_anims = function(path)
-		return anim9(_lanim(path))
-	end
-end
-
-local load_sound = memoize(function(filename)
-	return love.audio.newSource(filename)
-end)
-
-local load_font = memoize(function(filename, size)
-	return love.graphics.newFont(filename, size)
-end)
-
 local entities = {
 	spawn   = require "assets.entities.spawn",
 	tiger   = require "assets.entities.tiger",
@@ -87,7 +63,7 @@ local tigers = {
 	{ "Kahn",                     "def", { atk=2,  def=7, spd=2 },   75, 1.2 },
 	{ "Nyanners",                 "atk", { atk=1,  def=1, spd=1 },   35, 0.65 },
 	{ "Steve",                    "def", { atk=3,  def=3, spd=3 },   65, 1 },
-	{ "xXx_420_n0_Sc0p3_420_xXx", "spd", { atk=1,  def=1, spd=10 }, 150, 0.35 },
+	{ "xXx_420_n0_Sc0p3_420_xXx", "spd", { atk=1,  def=1, spd=10 }, 100, 0.35 },
 }
 
 local function set_stats(player, stat)
@@ -101,21 +77,21 @@ local function set_stats(player, stat)
 	if stat == "atk" then
 		text, sfx = gp.world.language:get("play/player_hickory")
 		-- print(_, sfx)
-		shift = load_sound(sfx)
+		shift = load.sound(sfx)
 		player.weapon_radius = 1.5
 		player.weapon_size = 0.55
 		player.max_cooldown = 1
 		player.speed = 3
 	elseif stat == "def" then
 		text, sfx = gp.world.language:get("play/player_shrublord")
-		shift = load_sound(sfx)
+		shift = load.sound(sfx)
 		player.weapon_radius = 1
 		player.weapon_size = 0.7
 		player.max_cooldown = 1
 		player.speed = 3
 	else
 		text, sfx = gp.world.language:get("play/player_bow")
-		shift = load_sound(sfx)
+		shift = load.sound(sfx)
 		player.weapon_radius = 7.5
 		player.weapon_size = 0.35
 		player.max_cooldown = 0.65
@@ -255,7 +231,7 @@ function gp:enter(from, ngp)
 	end)
 
 	conversation:listen("player died", function()
-		local sfx = load_sound("assets/sfx/player_scream.wav")
+		local sfx = load.sound("assets/sfx/player_scream.wav")
 		sfx:setPosition((self.player.position / 10):unpack())
 		sfx:play()
 
@@ -270,7 +246,7 @@ function gp:enter(from, ngp)
 	end)
 
 	conversation:listen("killed enemy", function(enemy)
-		local sfx = load_sound("assets/sfx/tiger_mrow.wav")
+		local sfx = load.sound("assets/sfx/tiger_mrow.wav")
 		sfx:setPosition((enemy.position / 10):unpack())
 		sfx:play()
 
@@ -305,7 +281,7 @@ function gp:enter(from, ngp)
 	end)
 
 	conversation:listen("take damage", function()
-		local sfx = load_sound("assets/sfx/player_ouch.wav")
+		local sfx = load.sound("assets/sfx/player_ouch.wav")
 		sfx:setPosition((self.player.position / 10):unpack())
 		sfx:play()
 	end)
@@ -319,7 +295,7 @@ function gp:enter(from, ngp)
 			))
 
 			local text, sfx = gp.world.language:get("play/player_taiga")
-			sfx = load_sound(sfx)
+			sfx = load.sound(sfx)
 			sfx:play()
 			gp:draw_text(text, 2)
 		end)
@@ -343,46 +319,47 @@ function gp:enter(from, ngp)
 	})
 
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(-21, 22, 2),
 		sound_volume = 0.25
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(-11, 14, 1),
 		sound_volume = 0.95
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(-7, 9, 1),
 		sound_volume = 0.25
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(-12, -17, 2),
 		sound_volume = 0.5
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(21, 22, 2),
 		sound_volume = 0.5
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(11, 14, 1),
 		sound_volume = 0.75
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(-4, 12, 1),
 		sound_volume = 0.65
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(12, 17, 2),
 		sound_volume = 0.75
 	}
 
+	self.cooldown          = self.world:addSystem(require "systems.cooldown")
 	self.player_controller = self.world:addSystem(require "systems.player_controller")
 	self.attack            = self.world:addSystem(require "systems.attack")
 	self.movement          = self.world:addSystem(require "systems.movement")
@@ -415,13 +392,13 @@ function gp:enter(from, ngp)
 	self.player_controller.active = false
 
 	-- local _, sfx = gp.world.language:get("play/grandpa_letter")
-	-- local gpa = load_sound(sfx)
+	-- local gpa = load.sound(sfx)
 	-- gpa:setRelative(true)
 	-- gpa:play()
 	-- self.timer.add(gpa:getDuration(), f)
 
 	local text, sfx = gp.world.language:get("play/player_pine")
-	local pine = load_sound(sfx)
+	local pine = load.sound(sfx)
 	pine:setRelative(true)
 
 	self.timer.add(0.25, function()
@@ -476,7 +453,7 @@ function gp:draw()
 		love.graphics.rectangle("fill", i*(width/sections)+1, 1, width / sections - 2, height-2)
 	end
 
-	love.graphics.setFont(load_font("assets/fonts/NotoSans-Bold.ttf", 18))
+	love.graphics.setFont(load.font("assets/fonts/NotoSans-Bold.ttf", 18))
 	love.graphics.setColor(0, 0, 0, 180)
 	love.graphics.print(sf("HP: %d",  self.player.hp), width + 3, 5)
 	love.graphics.setColor(255, 255, 255, 220)
@@ -548,7 +525,7 @@ function gp:draw()
 	end
 
 	if FLAGS.debug_mode then
-		local font = load_font("assets/fonts/NotoSans-Bold.ttf", 18)
+		local font = load.font("assets/fonts/NotoSans-Bold.ttf", 18)
 		local str = tostring(self.player.position)
 		love.graphics.setFont(font)
 		love.graphics.setColor(0, 0, 0, 220)
@@ -557,7 +534,7 @@ function gp:draw()
 		love.graphics.print(str, anchor:right() - font:getWidth(str), anchor:top())
 	end
 
-	local font = load_font("assets/fonts/NotoSans-Bold.ttf", 16)
+	local font = load.font("assets/fonts/NotoSans-Bold.ttf", 16)
 	love.graphics.setFont(font)
 
 	-- Full screen fade, we don't care about logical positioning for this.
@@ -571,7 +548,7 @@ function gp:draw()
 		love.graphics.setColor(50, 20, 20, 255)
 		love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
 		love.graphics.setColor(255, 255, 255, 255)
-		local font = load_font("assets/fonts/NotoSans-Bold.ttf", 30)
+		local font = load.font("assets/fonts/NotoSans-Bold.ttf", 30)
 		local str = "WASTED"
 		love.graphics.setFont(font)
 		love.graphics.print(str, anchor:center_x() - font:getWidth(str) / 2, anchor:center_y() - 20)
@@ -606,7 +583,7 @@ function gp:draw()
 		love.graphics.rectangle("fill", i*(width/sections)+1, 1, width / sections - 2, height-2)
 	end
 
-	love.graphics.setFont(load_font("assets/fonts/NotoSans-Bold.ttf", 18))
+	love.graphics.setFont(load.font("assets/fonts/NotoSans-Bold.ttf", 18))
 	love.graphics.setColor(0, 0, 0, 180)
 	love.graphics.print(sf("%s",  self.aggro.name), 4, 32)
 	love.graphics.setColor(255, 255, 255, 220)

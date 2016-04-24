@@ -1,15 +1,5 @@
-local cpml    = require "cpml"
-local iqm     = require "iqm"
-local anim9   = require "anim9"
-local memoize = require "memoize"
-
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
-
-local load_anims = memoize(function(path)
-	return iqm.load_anims(path)
-end)
+local cpml = require "cpml"
+local load = require "load_files"
 
 return function(world, ngp)
 	entity = {
@@ -18,6 +8,7 @@ return function(world, ngp)
 		visible       = true,
 		rigid_body    = true,
 		dynamic       = true,
+		attacking     = false,
 		radius        = 0.25,
 		weapon_radius = 1,
 		weapon_size   = 0.5,
@@ -33,8 +24,8 @@ return function(world, ngp)
 		velocity      = cpml.vec3(0, 0, 0),
 		force         = cpml.vec3(0, 0, 0),
 		color         = { 0.75, 0.75, 0.75 },
-		mesh          = load_model(ngp and "assets/models/ngp.iqm" or "assets/models/mc.iqm", false),
-		animation     = anim9(load_anims("assets/models/mc.iqm")),
+		mesh          = load.model(ngp and "assets/models/ngp.iqm" or "assets/models/mc.iqm", false),
+		animation     = load.anims("assets/models/mc.iqm"),
 		stat          = "atk",
 		stats         = { atk=10, def=-10, spd=-10 },
 		textures      = {

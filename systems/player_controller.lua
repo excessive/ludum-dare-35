@@ -139,7 +139,7 @@ return tiny.processingSystem {
 		-- Move
 		entity.move = entity.orientation * cpml.quat.rotate(-angle, cpml.vec3(0, 0, 1)) * move
 
-		if entity.anim_cooldown <= 0 then
+		if entity.anim_cooldown == 0 then
 			entity.velocity = move * entity.speed * dt
 			entity.dodging  = false
 			entity.blocking = false
@@ -151,7 +151,7 @@ return tiny.processingSystem {
 		end
 
 		-- anim9
-		if entity.anim_cooldown <= 0 then
+		if entity.anim_cooldown == 0 then
 			if dodge and entity.stat ~= "def" then
 				entity.animation:reset()
 				entity.animation:play(entity.stat .. "_dodge")
@@ -190,13 +190,8 @@ return tiny.processingSystem {
 		end
 
 		--== Actions ==--
-		if entity.regen_cooldown and entity.hp < entity.max_hp then
-			entity.regen_cooldown = entity.regen_cooldown + dt
-
-			if entity.regen_cooldown >= 7 then
-				-- regen in 5 seconds
-				entity.hp = math.min(entity.hp + dt * 20, entity.max_hp)
-			end
+		if entity.regen_cooldown == 0 and entity.hp < entity.max_hp then
+			entity.hp = math.min(entity.hp + dt * 20, entity.max_hp)
 
 			if entity.hp == entity.max_hp then
 				entity.regen_cooldown = false
@@ -212,9 +207,8 @@ return tiny.processingSystem {
 
 		-- Do attack
 		if action and entity.cooldown == 0 then
+			entity.attacking = true
 			entity.animation:reset()
-
-			entity.regen_cooldown = 0
 
 			-- Perform animation
 			entity.animation:play(entity.stat .. "_attack")
@@ -232,8 +226,9 @@ return tiny.processingSystem {
 			self.sfx[entity.stat .. "_pattack"]:play()
 
 			-- Set cooldowns
-			entity.cooldown      = entity.max_cooldown
-			entity.anim_cooldown = entity.animation:length()
+			entity.cooldown       = entity.max_cooldown
+			entity.anim_cooldown  = entity.animation:length()
+			entity.regen_cooldown = 7
 		end
 	end
 }

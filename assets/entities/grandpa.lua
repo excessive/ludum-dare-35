@@ -1,15 +1,5 @@
-local cpml    = require "cpml"
-local iqm     = require "iqm"
-local anim9   = require "anim9"
-local memoize = require "memoize"
-
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
-
-local load_anims = memoize(function(path)
-	return iqm.load_anims(path)
-end)
+local cpml = require "cpml"
+local load = require "load_files"
 
 return function(world)
 	entity = {
@@ -25,8 +15,8 @@ return function(world)
 		velocity      = cpml.vec3(0, 0, 0),
 		force         = cpml.vec3(0, 0, 0),
 		color         = { 0.75, 0.75, 0.75 },
-		mesh          = load_model("assets/models/grandpa.iqm", false),
-		animation     = anim9(load_anims("assets/models/grandpa.iqm")),
+		mesh          = load.model("assets/models/grandpa.iqm", false),
+		animation     = load.anims("assets/models/grandpa.iqm"),
 		textures      = {
 			body = "assets/textures/grandpa_diffuse_body.png",
 			head = "assets/textures/grandpa_diffuse_head.png"

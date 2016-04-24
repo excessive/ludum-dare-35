@@ -1,7 +1,7 @@
 local tiny = require "tiny"
 local cpml = require "cpml"
-local l3d = love.graphics.getLove3D()
-local memoize = require "memoize"
+local load = require "load_files"
+local l3d  = love.graphics.getLove3D()
 
 local renderer = tiny.system {
 	filter = tiny.requireAny(
@@ -70,11 +70,7 @@ function renderer:draw_overlay()
 	-- love.graphics.print(str, anchor:right() - width, anchor:top())
 end
 
-local get_texture = memoize(function(filename)
-	local texture = love.graphics.newImage(filename, flags)
-	texture:setFilter("linear", "linear", 16)
-	return texture
-end)
+
 
 function renderer:onAdd(entity)
 	if entity.light then
@@ -93,7 +89,7 @@ function renderer:onAdd(entity)
 			mipmaps = true
 		}
 		for _, v in pairs(entity.textures) do
-			get_texture(v) -- pre-load all the textures
+			load.texture(v) -- pre-load all the textures
 		end
 	end
 	if entity.particles then
@@ -385,7 +381,7 @@ function renderer:draw_entity(entity, shader, textures)
 
 	for _, buffer in ipairs(model) do
 		if textures then
-			model.mesh:setTexture(get_texture(textures[buffer.material]))
+			model.mesh:setTexture(load.texture(textures[buffer.material]))
 		else
 			model.mesh:setTexture()
 		end

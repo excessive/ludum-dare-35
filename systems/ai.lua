@@ -1,13 +1,9 @@
 local cpml       = require "cpml"
 local tiny       = require "tiny"
 local lume       = require "lume"
-local iqm        = require "iqm"
-local memoize    = require "memoize"
 local Pathfinder = require "jumper.pathfinder"
-
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
+local timer      = require "timer"
+local load       = require "load_files"
 
 local function to_grid(world, position)
 	local pos = cpml.vec3(position)
@@ -39,7 +35,7 @@ local function drop_nodes(world, path)
 			name = "node" .. i,
 			visible = true,
 			position = pos,
-			mesh = load_model("assets/models/cube.iqm", false)
+			mesh = load.model("assets/models/cube.iqm", false)
 		})
 	end
 	return nodes
@@ -65,16 +61,11 @@ return tiny.processingSystem {
 
 	onAdd = function(self, entity)
 		self.nodes[entity] = {}
+		entity.atk_delay = timer.new()
 	end,
 
 	process = function(self, entity, dt)
-		-- Count down to resetting aggro
-		if entity.aggro then
-			entity.aggro = entity.aggro - dt
-			if entity.aggro < 0 then
-				entity.aggro = 0
-			end
-		end
+		entity.atk_delay.update(dt)
 
 		-- if we're on the way somewhere, don't update the path.
 		if entity.arrived and self.nodes[entity] then
@@ -94,17 +85,22 @@ return tiny.processingSystem {
 		-- attack!
 		local distance = entity.position:dist(self.world.player.position)
 		if distance <= 1.5 and entity.cooldown == 0 then
-			-- Perform animation
-			entity.animation:reset()
-			entity.animation:play("attack")
+			entity.cooldown = entity.max_cooldown
 
-			-- Play sounds
-			self.sfx.attack:setPosition((entity.position / 10):unpack())
-			self.sfx.attack:play()
+			entity.atk_delay.add(0.25, function()
+				entity.attacking = true
 
-			-- Set cooldowns
-			entity.cooldown      = entity.max_cooldown
-			entity.anim_cooldown = entity.animation:length()
+				-- Perform animation
+				entity.animation:reset()
+				entity.animation:play("attack")
+
+				-- Play sounds
+				self.sfx.attack:setPosition((entity.position / 10):unpack())
+				self.sfx.attack:play()
+
+				-- Set cooldowns
+				entity.anim_cooldown = entity.animation:length()
+			end)
 		end
 
 		local queue = false

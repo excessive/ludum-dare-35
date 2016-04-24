@@ -1,9 +1,9 @@
-local anchor = require "anchor"
+local anchor  = require "anchor"
 local convoke = require "convoke"
-local cpml  = require "cpml"
-local lume  = require "lume"
-local timer = require "timer"
-local tiny = require "tiny"
+local cpml    = require "cpml"
+local lume    = require "lume"
+local timer   = require "timer"
+local tiny    = require "tiny"
 
 local credits = tiny.system {}
 

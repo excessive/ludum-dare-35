@@ -1,13 +1,11 @@
 local tiny       = require "tiny"
 local lume       = require "lume"
-local memoize    = require "memoize"
 local cpml       = require "cpml"
-local iqm        = require "iqm"
-local anim9      = require "anim9"
 local map_loader = require "map"
 local anchor     = require "anchor"
 local timer      = require "timer"
 local convoke    = require "convoke"
+local load       = require "load_files"
 
 conversation = require("talkback").new()
 
@@ -39,28 +37,6 @@ local gp = tiny.system {
 	end
 }
 
-local load_model = memoize(function(path, actor)
-	return iqm.load(path, actor)
-end)
-
-local load_anims
-do
-	local _lanim = memoize(function(path)
-		return iqm.load_anims(path)
-	end)
-	load_anims = function(path)
-		return anim9(_lanim(path))
-	end
-end
-
-local load_sound = memoize(function(filename)
-	return love.audio.newSource(filename)
-end)
-
-local load_font = memoize(function(filename, size)
-	return love.graphics.newFont(filename, size)
-end)
-
 local entities = {
 	spawn   = require "assets.entities.spawn",
 	tiger   = require "assets.entities.tiger",
@@ -81,11 +57,11 @@ function gp:enter(from, ngp)
 	love.filesystem.write("ngp", "")
 
 	self.text1, self.sfx1 = gp.world.language:get("play/grandpa_came")
-	self.sfx1 = load_sound(self.sfx1)
+	self.sfx1 = load.sound(self.sfx1)
 	self.sfx1:setRelative(true)
 
 	self.text2, self.sfx2 = gp.world.language:get("play/grandpa_gift")
-	self.sfx2 = load_sound(self.sfx2)
+	self.sfx2 = load.sound(self.sfx2)
 	self.sfx2:setRelative(true)
 
 	self.time = 0
@@ -151,42 +127,42 @@ function gp:enter(from, ngp)
 	})
 
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(-21, 22, 2),
 		sound_volume = 0.25
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(-11, 14, 1),
 		sound_volume = 0.95
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(-7, 9, 1),
 		sound_volume = 0.25
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(-12, -17, 2),
 		sound_volume = 0.5
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_a.wav"),
+		sound = load.sound("assets/sfx/birdsong_a.wav"),
 		position = cpml.vec3(21, 22, 2),
 		sound_volume = 0.5
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(11, 14, 1),
 		sound_volume = 0.75
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(-4, 12, 1),
 		sound_volume = 0.65
 	}
 	self.world:addEntity {
-		sound = load_sound("assets/sfx/birdsong_b.wav"),
+		sound = load.sound("assets/sfx/birdsong_b.wav"),
 		position = cpml.vec3(12, 17, 2),
 		sound_volume = 0.75
 	}
@@ -235,7 +211,7 @@ function gp:enter(from, ngp)
 			scale         = cpml.vec3(0.5, 0.5, 0.5),
 			position      = cpml.vec3(1, 20, 1),
 			color         = { 0.5, 0.75, 0.25 },
-			mesh          = load_model("assets/models/cube.iqm", false)
+			mesh          = load.model("assets/models/cube.iqm", false)
 		})
 		wait()
 		-- Fade out

@@ -61,6 +61,7 @@ function love.load()
 
 	-- Create world
 	local world         = tiny.world()
+	world.timestep      = timestep
 	world.language      = require("languages").load(PREFERENCES.language)
 	world.inputs        = world:addSystem(require "inputs")
 	world.particles     = world:addSystem(require "systems.particle")

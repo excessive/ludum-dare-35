@@ -1,10 +1,10 @@
 local tiny    = require "tiny"
 local lume    = require "lume"
-local memoize = require "memoize"
 local cpml    = require "cpml"
 local anchor  = require "anchor"
 local timer   = require "timer"
 local convoke = require "convoke"
+local load    = require "load_files"
 
 local gp = tiny.system {
 	name    = "letter",
@@ -16,14 +16,6 @@ local gp = tiny.system {
 	next_scene = "scenes.play"
 }
 
-local load_sound = memoize(function(filename)
-	return love.audio.newSource(filename)
-end)
-
-local load_font = memoize(function(filename, size)
-	return love.graphics.newFont(filename, size)
-end)
-
 function gp:enter(from, ngp)
 	self.ngp = ngp
 
@@ -34,7 +26,7 @@ function gp:enter(from, ngp)
 	end
 
 	self.text, self.sfx = gp.world.language:get("play/grandpa_letter")
-	self.sfx = load_sound(self.sfx)
+	self.sfx = load.sound(self.sfx)
 	-- self.sfx:setRelative(true)
 
 	-- Overlay fade
@@ -62,10 +54,19 @@ end
 
 function gp:update(dt)
 	self.timer.update(dt)
+
+	-- Check buttons
+	local gi     = self.world.inputs.game
+	local action = gi.action: pressed()
+
+	if action then
+		self.sfx:stop()
+		Scene.switch(require(self.next_scene), self.ngp)
+	end
 end
 
 function gp:draw()
-	local font = load_font("assets/fonts/NotoSans-Bold.ttf", 20)
+	local font = load.font("assets/fonts/NotoSans-Bold.ttf", 20)
 	love.graphics.setFont(font)
 
 	love.graphics.setColor(0, 0, 0, 255)

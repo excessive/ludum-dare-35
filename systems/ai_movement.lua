@@ -29,13 +29,6 @@ return tiny.processingSystem {
 			entity.position.x = entity.position.x + entity.velocity.x
 			entity.position.y = entity.position.y + entity.velocity.y
 			entity.position.z = entity.position.z + entity.velocity.z
-
-			entity.knockback = entity.knockback - dt
-
-			if entity.knockback < 0 then
-				entity.knockback = 0
-			end
-
 			return
 		end
 
@@ -45,7 +38,7 @@ return tiny.processingSystem {
 			entity.arrived = true
 
 			-- get direction towards player
-			if entity.position:dist(self.world.player.position) < 2.5 then
+			if (entity.stun and entity.stun <= 0) and entity.position:dist(self.world.player.position) < 2.5 then
 				entity.direction = (self.world.player.position - entity.position):normalize()
 				orient(entity)
 			end
@@ -74,23 +67,25 @@ return tiny.processingSystem {
 			end
 		end
 
-		if entity.cooldown == 0 then
-			entity.animation:play("run")
-			entity.arrived = false
-			entity.move_to = target
-
-			-- get direction towards next step
-			entity.direction = (entity.move_to - entity.position):normalize()
-			entity.velocity  = entity.direction * entity.speed * dt
-			orient(entity)
-
-			entity.position.x = entity.position.x + entity.velocity.x
-			entity.position.y = entity.position.y + entity.velocity.y
-			entity.position.z = entity.position.z + entity.velocity.z
-
-			entity.velocity.x = 0
-			entity.velocity.y = 0
-			entity.velocity.z = 0
+		if entity.cooldown > 0 or (entity.stun and entity.stun > 0) then
+			return
 		end
+
+		entity.animation:play("run")
+		entity.arrived = false
+		entity.move_to = target
+
+		-- get direction towards next step
+		entity.direction = (entity.move_to - entity.position):normalize()
+		entity.velocity  = entity.direction * entity.speed * dt
+		orient(entity)
+
+		entity.position.x = entity.position.x + entity.velocity.x
+		entity.position.y = entity.position.y + entity.velocity.y
+		entity.position.z = entity.position.z + entity.velocity.z
+
+		entity.velocity.x = 0
+		entity.velocity.y = 0
+		entity.velocity.z = 0
 	end
 }
