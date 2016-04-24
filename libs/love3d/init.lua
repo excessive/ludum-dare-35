@@ -483,15 +483,15 @@ end
 function l3d.bind_shadow_map(map)
 	if map then
 		assert(map.shadow_map)
+		gl.DrawBuffer(GL.NONE)
 		love.graphics.setCanvas(map.dummy_canvas)
 		gl.BindFramebuffer(GL.FRAMEBUFFER, map.buffers[0])
-		gl.DrawBuffer(GL.NONE)
 		gl.Viewport(0, 0, map.width, map.height)
 	else
-		gl.DrawBuffer(GL.BACK)
 		--- XXX: This is not a good assumption on ES!
 		-- gl.BindFramebuffer(0)
 		love.graphics.setCanvas()
+		gl.DrawBuffer(GL.BACK)
 	end
 end
 
